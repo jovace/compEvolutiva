@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.HashMap;
 
 import model.*;
+import tools.Logger;
 import evolutivo.*;
 import java.lang.Math;
  
@@ -35,24 +36,31 @@ public class CampoBatalla{
 
         int cRonda=0;
         while(estadoA.get("HP")>0 && estadoB.get("HP")>0 && cRonda<50){
+        	Logger.INFO("Ronda "+cRonda+". "
+        			+ "{"+this.estadoA.get("HP")+","+this.estadoA.get("EN")+"} - "
+        			+ "{"+this.estadoB.get("HP")+","+this.estadoB.get("EN")+"}", 0);
             turno();
             cRonda++;
         }
 
         int[] resultado={0,0,0,0,0};
-        if(estadoA.get("HP")>0 && estadoB.get("HP")>0){
-            System.out.println("EMPATE. Criatura A: "+this.estadoA.get("HP")
-                + "HP. Criatura B: "+this.estadoB.get("HP")+"HP.");
-            resultado[0]=0;
-        }else if(estadoA.get("HP")<=0){
-            System.out.println("GANA B. Criatura A: "+this.estadoA.get("HP")
-                + "HP. Criatura B: "+this.estadoB.get("HP")+"HP.");
-            resultado[0]=1;
-        }else if(estadoB.get("HP")<=0){
-            System.out.println("GANA A. Criatura A: "+this.estadoA.get("HP")
-                + "HP. Criatura B: "+this.estadoB.get("HP")+"HP.");
-            resultado[0]=-1;
-        }
+		if (estadoA.get("HP") > 0 && estadoB.get("HP") > 0) {
+			Logger.INFO("EMPATE. Criatura A: " + this.estadoA.get("HP") + "HP. Criatura B: "
+					+ this.estadoB.get("HP") + "HP.", 2);
+			resultado[0] = 0;
+		} else if (estadoA.get("HP") <= 0 && estadoB.get("HP") <= 0 && estadoA.get("HP").equals(estadoB.get("HP"))) {
+			Logger.INFO("EMPATE. Criatura A: " + this.estadoA.get("HP") + "HP. Criatura B: "
+					+ this.estadoB.get("HP") + "HP.", 2);
+			resultado[0] = 0;
+		} else if (estadoA.get("HP") <= 0 && estadoA.get("HP")<estadoB.get("HP")) {
+			Logger.INFO("GANA B. Criatura A: " + this.estadoA.get("HP") + "HP. Criatura B: "
+					+ this.estadoB.get("HP") + "HP.", 2);
+			resultado[0] = 1;
+		} else if (estadoB.get("HP") <= 0 && estadoB.get("HP")<estadoA.get("HP")) {
+			Logger.INFO("GANA A. Criatura A: " + this.estadoA.get("HP") + "HP. Criatura B: "
+					+ this.estadoB.get("HP") + "HP.", 2);
+			resultado[0] = -1;
+		}
 
         resultado[1]=this.estadoA.get("HP");
         resultado[2]=this.estadoB.get("HP");
@@ -79,20 +87,25 @@ public class CampoBatalla{
 
         String accionB=this.b.realizarAccion(indicadores);
 
+        
+        
         if(accionA.equals("ESQUIVAR") && this.estadoA.get("EN")<2) accionA="PASAR";
-        else if(accionB.equals("ESQUIVAR") && this.estadoB.get("EN")<2) accionB="PASAR";
         else if(accionA.equals("BLOQUEAR") && this.estadoA.get("EN")<3) accionA="PASAR";
-        else if(accionB.equals("BLOQUEAR") && this.estadoB.get("EN")<3) accionB="PASAR";
         else if(accionA.equals("ATACAR") && this.estadoA.get("EN")<1) accionA="PASAR";
+        
+        if(accionB.equals("ESQUIVAR") && this.estadoB.get("EN")<2) accionB="PASAR";
+        else if(accionB.equals("BLOQUEAR") && this.estadoB.get("EN")<3) accionB="PASAR";        
         else if(accionB.equals("ATACAR") && this.estadoB.get("EN")<1) accionB="PASAR";
 
+        Logger.INFO("A->"+accionA+"; B->"+accionB, 0);
+        
         if(accionA.equals("PASAR")){
             this.estadoA.put("EN",this.estadoA.get("EN")+1);
 
             if(accionB.equals("PASAR")){                
                 this.estadoB.put("EN",this.estadoB.get("EN")+1);
             }else if(accionB.equals("ATACAR")){
-                int dano = this.b.getAtaque()-this.a.getArmadura();
+                int dano = this.b.getAtaque()-(int)(this.a.getArmadura()*0.5);
                 if(dano<0)dano=0;
                 this.estadoA.put("HP",this.estadoA.get("HP")-dano);
                 this.estadoB.put("dmg_done",this.estadoB.get("dmg_done")+dano);
@@ -106,19 +119,19 @@ public class CampoBatalla{
             sumar(estadoA, "EN", -1);
 
             if(accionB.equals("PASAR")){
-                int dano = this.a.getAtaque()-this.b.getArmadura();
+                int dano = this.a.getAtaque()-(int)(this.b.getArmadura()*0.5);
                 if(dano<0)dano=0;
                 sumar(estadoB, "HP", -dano);
                 sumar(estadoA, "dmg_done", dano);
                 
                 this.estadoB.put("EN",this.estadoB.get("EN")+1);
             }else if(accionB.equals("ATACAR")){
-                int dano = this.a.getAtaque()-this.b.getArmadura();
+            	int dano = this.a.getAtaque()-(int)(this.b.getArmadura()*0.5);
                 if(dano<0)dano=0;
                 sumar(estadoB, "HP", -dano);
                 sumar(estadoA, "dmg_done", dano);
 
-                dano = this.b.getAtaque()-this.a.getArmadura();
+                dano = this.b.getAtaque()-(int)(this.a.getArmadura()*0.5);
                 if(dano<0)dano=0;
                 this.estadoA.put("HP",this.estadoA.get("HP")-dano);
                 this.estadoB.put("dmg_done",this.estadoB.get("dmg_done")+dano);
@@ -127,7 +140,7 @@ public class CampoBatalla{
             }else if(accionB.equals("BLOQUEAR")){
                 sumar(estadoB, "EN", -3);
             }else if(accionB.equals("ESQUIVAR")){
-                int dano = this.a.getAtaque()-this.b.getArmadura();
+            	int dano = this.a.getAtaque()-(int)(this.b.getArmadura()*0.5);
 
                 double probEsquivar = 0.3; //De momento estatico, pero hay que ajustarlo en funcion de AG
                 if(Math.random()>probEsquivar){
@@ -155,7 +168,7 @@ public class CampoBatalla{
             if(accionB.equals("PASAR")){
                 sumar(estadoB, "EN", 1);
             }else if(accionB.equals("ATACAR")){
-                int dano = this.b.getAtaque()-this.a.getArmadura();
+                int dano = this.b.getAtaque()-(int)(this.a.getArmadura()*0.5);
 
                 double probEsquivar = 0.3; //De momento estatico, pero hay que ajustarlo en funcion de AG
                 if(Math.random()>probEsquivar){

@@ -58,7 +58,7 @@ public class Criatura{
             return "PASAR";
         }
 
-        float valMax=0;
+        float valMax=Float.NEGATIVE_INFINITY;
         String accMax="";
 
         float[] pesos;

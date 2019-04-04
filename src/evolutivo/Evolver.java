@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 import java.util.HashMap;
 
 import model.*;
+import tools.Logger;
 
 public class Evolver{
         
@@ -46,7 +47,7 @@ public class Evolver{
             }
             Criatura c = new Criatura(adn);
             this.poblacion.add(c);
-            System.out.println(Arrays.toString(c.getAdn()));
+            Logger.INFO(Arrays.toString(c.getAdn()), 7);
         }
     }
 
@@ -54,7 +55,7 @@ public class Evolver{
         //Comienza la ejecucion del algoritmo
         int generaciones=0;
         while(generaciones<50){//Condicion de parada
-        	System.out.println("Empezando ronda "+generaciones);
+        	Logger.INFO("Empezando ronda "+generaciones, 4);
         	
             //Simula los emparejamientos de todos los individuos con todos y obtiene puntuaciones
             simularPartidos();
@@ -63,10 +64,10 @@ public class Evolver{
 
             //Dependiendo del record de victorias/derrotas y otras clasificaciones, 
             //otorga probabilidades de seleccion
-            System.out.println("Entrando a fase ranking");
+            Logger.INFO("Entrando a fase ranking",4);
             realizarRanking();
 
-            System.out.println("Entrando a fase seleccion"); 
+            Logger.INFO("Entrando a fase seleccion",4); 
             //Selecciona individuos para la siguiente generacion dependiendo de probabilidades del ranking
             seleccion();
             
@@ -88,7 +89,7 @@ public class Evolver{
             for(Criatura c2 : this.poblacion){
                 if(c1.equals(c2))continue;
                 
-                System.out.println("PARTIDO: "+c1.getNombre()+" contra "+c2.getNombre());
+                Logger.INFO("PARTIDO: "+c1.getNombre()+" contra "+c2.getNombre(), 5);
 
                 //[victoria, hpA, hpB, dmgA, dmgB]
                 int[] resultado = (new CampoBatalla()).combate(c1,c2);
@@ -147,9 +148,9 @@ public class Evolver{
 
         List<Criatura> nuevaGeneracion = new ArrayList<Criatura>();
         
-        System.out.println("Imprimiendo tabla probs");
+        Logger.INFO("Imprimiendo tabla probs", 8);
         for(Entry<Criatura, Intervalo> e : this.tablaProbs.entrySet()) {
-        	System.out.println("Entrada "+e.getKey()+"->("+e.getValue().inf+","+e.getValue().sup+")");
+        	Logger.INFO("Entrada "+e.getKey()+"->("+e.getValue().inf+","+e.getValue().sup+")", 8);
         }
 
         for(int i=0;i<this.config.getTamanoPoblacion();i++){
@@ -175,11 +176,11 @@ public class Evolver{
             if(a!= null && b != null){
                 Criatura res = cruce(a,b);
                 nuevaGeneracion.add(res);
-                System.out.println("Seleccionamos criatura ");
-                System.out.println(res.getNombre());
-                System.out.println("A partir de ");
-                System.out.println("A: "+a.getNombre());
-                System.out.println("B: "+b.getNombre());
+                Logger.INFO("Seleccionamos criatura ",8);
+                Logger.INFO(res.getNombre(), 8);
+                Logger.INFO("A partir de ", 8);
+                Logger.INFO("A: "+a.getNombre(), 8);
+                Logger.INFO("B: "+b.getNombre(), 8);
             }else{
                 i--;
             }            
@@ -227,18 +228,18 @@ public class Evolver{
     }
 
     private void printResultadosPartidos(){
-        System.out.print("{");
+    	Logger.INFO("{", 7);
         for(Criatura c : this.poblacion){
-            System.out.print("[ "+this.victorias.get(c)+", "+this.dmgDone.get(c)+"],");
+        	Logger.INFO("[ "+this.victorias.get(c)+", "+this.dmgDone.get(c)+"],", 7);
         }
-        System.out.println("}");
+        Logger.INFO("}", 7);
     }
     
     
     private void printResumenPoblacion() {
-    	System.out.println("----------------------");
-    	System.out.println("Resumen de poblacion");
-    	System.out.println("----------------------");
+    	Logger.INFO("----------------------", 9);
+    	Logger.INFO("Resumen de poblacion", 9);
+    	Logger.INFO("----------------------", 9);
     	for(Criatura c : this.poblacion) {
     		String adnHash="";
     		try {
@@ -254,10 +255,10 @@ public class Evolver{
 				e.printStackTrace();
 			}
     		
-    		System.out.println("Criatura: "+c.getNombre()+" adnHash: "+adnHash);
+    		Logger.INFO("Criatura: "+c.getNombre()+" adnHash: "+adnHash, 9);
     	}
     	
-    	System.out.println("----------------------");
+    	Logger.INFO("----------------------", 9);
     }
 
 
