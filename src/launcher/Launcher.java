@@ -1,15 +1,19 @@
+package launcher;
+
+import evolutivo.*;
+
 public class Launcher{
 
     public static void main(String[] args){
         Evolver e = new Evolver();
 
         //Crear configuracion
-        EvolverConfig conf = new EvolverConfig();
+        EvolverConfig conf = new EvolverConfig(10);
 
-        e.setConfig(config);
+        e.setConfig(conf);
+        
+        e.inicializar();
+        e.run();
 
-        Resutado = e.run();
-
-        System.out.println(resultado);
     }
 }
