@@ -8,7 +8,7 @@ public class Launcher{
         Evolver e = new Evolver();
 
         //Crear configuracion
-        EvolverConfig conf = new EvolverConfig(10);
+        EvolverConfig conf = new EvolverConfig(20);
 
         e.setConfig(conf);
         

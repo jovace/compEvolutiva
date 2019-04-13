@@ -1,14 +1,21 @@
 package evolutivo;
 
 public class EvolverConfig{
+	public static enum TIPO_SELECCION {
+		RULETA,
+		TORNEO
+	}
+	
     int tamanoPoblacion;
     double ratioMutacion;
     double tasaMutacion;
+    TIPO_SELECCION tipoSeleccion;
 
     public EvolverConfig(int tamanoPoblacion){
         this.tamanoPoblacion=tamanoPoblacion;
-        this.ratioMutacion=1.5;
-        this.tasaMutacion=0.1;
+        this.ratioMutacion=4;
+        this.tasaMutacion=0.5;
+        this.tipoSeleccion=TIPO_SELECCION.RULETA;
     }
 
     public int getTamanoPoblacion(){

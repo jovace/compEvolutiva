@@ -23,6 +23,26 @@ public class Criatura{
         this.adn = new Adn(adn);
         this.nombre=Arrays.toString(adn).hashCode()+"";
     }
+    
+    public String printGenoma() {
+    	String genoma="CF={";
+    	genoma+="AT:"+this.getAtaque()+", ";
+    	genoma+="AR:"+this.getArmadura()+", ";
+    	genoma+="AG:"+this.getAgilidad()+", ";
+    	genoma+="EN:"+this.getEN()+", ";
+    	genoma+="HP:"+this.getHP()+"} \n";
+    	genoma+="Pesos={ \n";
+    	genoma+="HPDiff, ENDiff, ATDiff, ARDiff \n";
+    	genoma+="Atacar: "+Arrays.toString(this.adn.getPesosAtacar()) + " \n";
+    	genoma+="Bloquear: "+Arrays.toString(this.adn.getPesosBloquear()) + " \n";
+    	genoma+="Esquivar: "+Arrays.toString(this.adn.getPesosEsquivar()) + " \n";
+    	genoma+="Pasar: "+Arrays.toString(this.adn.getPesosPasar()) + " \n";
+    	genoma+="}";
+    	
+    	return genoma;
+    	
+    	
+    }
 
     public String getNombre(){
         return this.nombre;
