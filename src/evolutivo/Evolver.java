@@ -17,14 +17,14 @@ import tools.Logger;
 
 public class Evolver{
         
-    List<Criatura> poblacion;
-    List<Criatura> poblacionPrueba;
-    EvolverConfig config;   //Ajustas los parametros del algoritmo evolutivo
+    private Poblacion poblacion;
+    private Poblacion poblacionPrueba;
+    private EvolverConfig config;   //Ajustas los parametros del algoritmo evolutivo
 
-    Map<Criatura, Integer> victorias = new HashMap<Criatura, Integer>();
-    Map<Criatura, Integer> diffHP = new HashMap<Criatura, Integer>();
-    Map<Criatura, Integer> dmgDone = new HashMap<Criatura, Integer>();
-    Map<Criatura, Intervalo> tablaProbs = new HashMap<Criatura, Intervalo>();
+    private Map<Criatura, Integer> victorias = new HashMap<>();
+    private Map<Criatura, Integer> diffHP = new HashMap<>();
+    private Map<Criatura, Integer> dmgDone = new HashMap<>();
+    private Map<Criatura, Intervalo> tablaProbs = new HashMap<>();
     
     public Evolver(){}
 
@@ -35,49 +35,46 @@ public class Evolver{
     public void inicializar(){
         //Genera poblacion inicial. Sobrecarga con poblacion especifica.
         int tamanoPoblacion = this.config.getTamanoPoblacion();
-        this.poblacion=new ArrayList<Criatura>();
-        this.poblacionPrueba = new ArrayList<Criatura>();
+        List<Criatura> poblacionL=new ArrayList<>();
+        List<Criatura> poblacionPruebaL = new ArrayList<>();
 
         for(int i=0;i<tamanoPoblacion;i++){
-            float[] adn = new float[50];
-
-            for(int j=0;j<30;j++){
-                int valor = (int)(Math.random()*5);
-
-                adn[j]=valor;
-            }
-
-            for(int j=30;j<50;j++){
-                adn[j]=(float)(Math.random()-0.5)*20;
-            }
-            Criatura c = new Criatura(adn);
-            this.poblacion.add(c);
+            Criatura c = generarCriaturaAleatoria();
+            poblacionL.add(c);
             Logger.INFO(Arrays.toString(c.getAdn()), 7);
         }
         
         for(int i=0;i<tamanoPoblacion;i++){
-            float[] adn = new float[50];
-
-            for(int j=0;j<30;j++){
-                int valor = (int)(Math.random()*5);
-
-                adn[j]=valor;
-            }
-
-            for(int j=30;j<50;j++){
-                adn[j]=(float)(Math.random()-0.5)*20;
-            }
-            Criatura c = new Criatura(adn);
-            this.poblacionPrueba.add(c);
+            Criatura c = generarCriaturaAleatoria();
+            poblacionPruebaL.add(c);
             Logger.INFO(Arrays.toString(c.getAdn()), 7);
         }
+
+        poblacion=new Poblacion(poblacionL);
+        poblacionPrueba=new Poblacion(poblacionPruebaL);
+    }
+
+
+    private Criatura generarCriaturaAleatoria(){
+        float[] adn = new float[50];
+
+        for(int j=0;j<30;j++){
+            int valor = (int)(Math.random()*5);
+
+            adn[j]=valor;
+        }
+
+        for(int j=30;j<50;j++){
+            adn[j]=(float)(Math.random()-0.5)*20;
+        }
+        return new Criatura(adn);
     }
 
     public void run(){
         //Comienza la ejecucion del algoritmo
         int generaciones=0;
         while(generaciones<500){//Condicion de parada
-        	Logger.INFO("Empezando ronda "+generaciones, 4);
+        	Logger.INFO("Empezando ronda "+generaciones, 9);
         	
             //Simula los emparejamientos de todos los individuos con todos y obtiene puntuaciones
             simularPartidos();
@@ -110,8 +107,8 @@ public class Evolver{
         diffHP.clear();
         dmgDone.clear();
 
-        for(Criatura c1 : this.poblacion){
-            for(Criatura c2 : this.poblacionPrueba){
+        for(Criatura c1 : this.poblacion.getPoblacion()){
+            for(Criatura c2 : this.poblacionPrueba.getPoblacion()){
                 if(c1.equals(c2))continue;
                 
                 Logger.INFO("PARTIDO: "+c1.getNombre()+" contra "+c2.getNombre(), 5);
@@ -138,9 +135,9 @@ public class Evolver{
     private void realizarRanking(){
         tablaProbs.clear();
 
-        Map<Criatura, Double> puntuacion = new HashMap<Criatura, Double>();
+        Map<Criatura, Double> puntuacion = new HashMap<>();
         double total=0.0;
-        for(Criatura c : this.poblacion){
+        for(Criatura c : this.poblacion.getPoblacion()){
         	Double valor=evaluar(c);
         	if(valor<0)valor=0.0;
             puntuacion.put(c, valor);
@@ -150,14 +147,14 @@ public class Evolver{
 
 		if (total != 0 && this.config.tipoSeleccion!=TIPO_SELECCION.TORNEO) {
 			double acumulado = 0;
-			for (Criatura c : this.poblacion) {
+			for (Criatura c : this.poblacion.getPoblacion()) {
 				tablaProbs.put(c, new Intervalo(acumulado, acumulado + puntuacion.get(c) / total));
 				acumulado += puntuacion.get(c) / total;
 			}
 		} else {
 
 			double acumulado = 0;
-			for (Criatura c : this.poblacion) {
+			for (Criatura c : this.poblacion.getPoblacion()) {
 				tablaProbs.put(c,
 						new Intervalo(acumulado, acumulado + ((double) 1 / this.config.getTamanoPoblacion())));
 				acumulado += ((double) 1 / this.config.getTamanoPoblacion());
@@ -166,9 +163,7 @@ public class Evolver{
     }
 
     private void seleccion(){
-        List<Criatura> generacionPrevia = this.poblacion;
-
-        List<Criatura> nuevaGeneracion = new ArrayList<Criatura>();
+        List<Criatura> nuevaGeneracion = new ArrayList<>();
         
         Logger.INFO("Imprimiendo tabla probs", 8);
         for(Entry<Criatura, Intervalo> e : this.tablaProbs.entrySet()) {
@@ -181,7 +176,7 @@ public class Evolver{
 				Criatura b = null;
 
 				double rnd = Math.random();
-				for (Criatura c : this.poblacion) {
+				for (Criatura c : this.poblacion.getPoblacion()) {
 					if (tablaProbs.get(c).belongsTo(rnd)) {
 						a = c;
 						break;
@@ -189,7 +184,7 @@ public class Evolver{
 				}
 
 				rnd = Math.random();
-				for (Criatura c : this.poblacion) {
+				for (Criatura c : this.poblacion.getPoblacion()) {
 					if (tablaProbs.get(c).belongsTo(rnd)) {
 						b = c;
 						break;
@@ -215,7 +210,7 @@ public class Evolver{
 				Criatura c = null;
 
 				double rnd = Math.random();
-				for (Criatura d : this.poblacion) {
+				for (Criatura d : this.poblacion.getPoblacion()) {
 					if (tablaProbs.get(d).belongsTo(rnd)) {
 						a = d;
 						break;
@@ -223,7 +218,7 @@ public class Evolver{
 				}
 
 				rnd = Math.random();
-				for (Criatura d : this.poblacion) {
+				for (Criatura d : this.poblacion.getPoblacion()) {
 					if (tablaProbs.get(d).belongsTo(rnd)) {
 						b = d;
 						break;
@@ -273,7 +268,7 @@ public class Evolver{
 			}
 		}
 
-        this.poblacion = nuevaGeneracion;
+        this.poblacion.setPoblacion(nuevaGeneracion);
     }
 
     private void sumar(Map<Criatura, Integer> map, Criatura c, Integer valor){
@@ -309,20 +304,23 @@ public class Evolver{
 
                 adnR[i]*=(ratioMutacion*muta);
             }
+
+            if(Math.abs(adnR[i])>10)
+                if(adnR[i]>0){adnR[i]=10;}else{adnR[i]=-10;}
         }
 
         return new Criatura(adnR);
     }
     
-    public Double evaluar(Criatura c) {
+    private Double evaluar(Criatura c) {
     	Integer victorias = this.victorias.get(c);
     	if(victorias==null)victorias=0;
-    	return (double) 10*victorias+2*dmgDone.get(c)+diffHP.get(c);
+    	return (double) (10*victorias+2*dmgDone.get(c)+diffHP.get(c))*Math.abs(this.poblacion.calcSD(c));
     }
 
     private void printResultadosPartidos(){
     	Logger.INFO("{", 7);
-        for(Criatura c : this.poblacion){
+        for(Criatura c : this.poblacion.getPoblacion()){
         	Logger.INFO("[ "+Arrays.toString(Arrays.copyOfRange(c.getAdn(), 0, 30))+", "+this.victorias.get(c)+", "+this.dmgDone.get(c)+"],", 7);
         }
         Logger.INFO("}", 7);
@@ -333,13 +331,13 @@ public class Evolver{
     	Logger.INFO("----------------------", 9);
     	Logger.INFO("Resumen de poblacion", 9);
     	Logger.INFO("----------------------", 9);
-    	for(Criatura c : this.poblacion) {
+    	for(Criatura c : this.poblacion.getPoblacion()) {
     		String adnHash="";
     		try {
 				MessageDigest md = MessageDigest.getInstance("MD5");
 				md.update(Arrays.toString(c.getAdn()).getBytes());
 				byte[] digest=md.digest();
-				StringBuffer sb = new StringBuffer();
+				StringBuilder sb = new StringBuilder();
 				for(byte b : digest) {
 					sb.append(String.format("%02x", b & 0xff));
 				}
@@ -348,7 +346,7 @@ public class Evolver{
 				e.printStackTrace();
 			}
     		
-    		Logger.INFO("Criatura: "+c.getNombre()+" adnHash: "+adnHash+" victorias:"+this.victorias.get(c), 9);
+    		Logger.INFO("Criatura: "+c.getNombre()+" "+c.printCFisicas()+" Victorias:"+this.victorias.get(c) + " SD:"+this.poblacion.calcSD(c), 9);
     	}
     	
     	Logger.INFO("----------------------", 9);
@@ -359,12 +357,12 @@ public class Evolver{
         double inf;
         double sup;
 
-        public Intervalo(double i, double s){
+        Intervalo(double i, double s){
             this.inf=i;
             this.sup=s;
         }
 
-        public boolean belongsTo(double val){
+        boolean belongsTo(double val){
             return (this.inf<val && val<=this.sup);
         }
     }

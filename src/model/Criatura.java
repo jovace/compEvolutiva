@@ -25,12 +25,7 @@ public class Criatura{
     }
     
     public String printGenoma() {
-    	String genoma="CF={";
-    	genoma+="AT:"+this.getAtaque()+", ";
-    	genoma+="AR:"+this.getArmadura()+", ";
-    	genoma+="AG:"+this.getAgilidad()+", ";
-    	genoma+="EN:"+this.getEN()+", ";
-    	genoma+="HP:"+this.getHP()+"} \n";
+    	String genoma=printCFisicas();
     	genoma+="Pesos={ \n";
     	genoma+="HPDiff, ENDiff, ATDiff, ARDiff \n";
     	genoma+="Atacar: "+Arrays.toString(this.adn.getPesosAtacar()) + " \n";
@@ -40,8 +35,16 @@ public class Criatura{
     	genoma+="}";
     	
     	return genoma;
-    	
-    	
+    }
+
+    public String printCFisicas(){
+        String genoma="CF={";
+        genoma+="AT:"+this.getAtaque()+", ";
+        genoma+="AR:"+this.getArmadura()+", ";
+        genoma+="AG:"+this.getAgilidad()+", ";
+        genoma+="EN:"+this.getEN()+", ";
+        genoma+="HP:"+this.getHP()+"} \n";
+        return genoma;
     }
 
     public String getNombre(){
