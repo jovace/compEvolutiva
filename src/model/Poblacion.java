@@ -66,5 +66,23 @@ public class Poblacion {
         return dist;
     }
 
+    public void sustituirCercano(Criatura criatura){
+        float minDist=Float.MAX_VALUE;
+        Criatura minC=null;
+
+        for(Criatura c : this.poblacion){
+            float d=calculateDistance(criatura.getAdn(), c.getAdn());
+            if(d<minDist){
+                minDist=d;
+                minC=c;
+            }
+        }
+
+        if(minC!=null){
+            this.poblacion.remove(minC);
+            this.poblacion.add(criatura);
+        }
+    }
+
 
 }

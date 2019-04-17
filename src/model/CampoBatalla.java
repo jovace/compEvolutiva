@@ -12,6 +12,12 @@ import java.lang.Math;
  
 public class CampoBatalla{
     private final int NUM_INDICADORES=5;
+
+
+    //PARAMETROS DE COMBATE
+    private final double PESO_ARMADURA = 0.3;
+
+
     //Simula el  enfrentamiento entre dos criaturas
 
     Criatura a,b;
@@ -105,7 +111,7 @@ public class CampoBatalla{
             if(accionB.equals("PASAR")){                
                 this.estadoB.put("EN",this.estadoB.get("EN")+1);
             }else if(accionB.equals("ATACAR")){
-                int dano = this.b.getAtaque()-(int)(this.a.getArmadura()*0.5);
+                int dano = this.b.getAtaque()-(int)(this.a.getArmadura()*PESO_ARMADURA);
                 if(dano<0)dano=0;
                 this.estadoA.put("HP",this.estadoA.get("HP")-dano);
                 this.estadoB.put("dmg_done",this.estadoB.get("dmg_done")+dano);
@@ -119,19 +125,19 @@ public class CampoBatalla{
             sumar(estadoA, "EN", -1);
 
             if(accionB.equals("PASAR")){
-                int dano = this.a.getAtaque()-(int)(this.b.getArmadura()*0.5);
+                int dano = this.a.getAtaque()-(int)(this.b.getArmadura()*PESO_ARMADURA);
                 if(dano<0)dano=0;
                 sumar(estadoB, "HP", -dano);
                 sumar(estadoA, "dmg_done", dano);
                 
                 this.estadoB.put("EN",this.estadoB.get("EN")+1);
             }else if(accionB.equals("ATACAR")){
-            	int dano = this.a.getAtaque()-(int)(this.b.getArmadura()*0.5);
+            	int dano = this.a.getAtaque()-(int)(this.b.getArmadura()*PESO_ARMADURA);
                 if(dano<0)dano=0;
                 sumar(estadoB, "HP", -dano);
                 sumar(estadoA, "dmg_done", dano);
 
-                dano = this.b.getAtaque()-(int)(this.a.getArmadura()*0.5);
+                dano = this.b.getAtaque()-(int)(this.a.getArmadura()*PESO_ARMADURA);
                 if(dano<0)dano=0;
                 this.estadoA.put("HP",this.estadoA.get("HP")-dano);
                 this.estadoB.put("dmg_done",this.estadoB.get("dmg_done")+dano);
@@ -140,9 +146,9 @@ public class CampoBatalla{
             }else if(accionB.equals("BLOQUEAR")){
                 sumar(estadoB, "EN", -3);
             }else if(accionB.equals("ESQUIVAR")){
-            	int dano = this.a.getAtaque()-(int)(this.b.getArmadura()*0.5);
+            	int dano = this.a.getAtaque()-(int)(this.b.getArmadura()*PESO_ARMADURA);
 
-                double probEsquivar = 0.3; //De momento estatico, pero hay que ajustarlo en funcion de AG
+                double probEsquivar = calcProbabilidadEsquivar(this.b.getAgilidad());
                 if(Math.random()>probEsquivar){
                     if(dano<0)dano=0;
                     sumar(estadoB, "HP", -dano);
@@ -168,9 +174,9 @@ public class CampoBatalla{
             if(accionB.equals("PASAR")){
                 sumar(estadoB, "EN", 1);
             }else if(accionB.equals("ATACAR")){
-                int dano = this.b.getAtaque()-(int)(this.a.getArmadura()*0.5);
+                int dano = this.b.getAtaque()-(int)(this.a.getArmadura()*PESO_ARMADURA);
 
-                double probEsquivar = 0.3; //De momento estatico, pero hay que ajustarlo en funcion de AG
+                double probEsquivar = calcProbabilidadEsquivar(this.a.getAgilidad());
                 if(Math.random()>probEsquivar){
                     if(dano<0)dano=0;
                     sumar(estadoA, "HP", -dano);
@@ -188,5 +194,9 @@ public class CampoBatalla{
 
     private void sumar(Map<String,Integer> mapa, String clave, int valor){
         mapa.put(clave, mapa.get(clave)+valor);
+    }
+
+    private double calcProbabilidadEsquivar(int AG){
+        return 0.3+(0.022*AG)+(-0.00085*AG*AG)+(0.000015*(AG^3));
     }
 }

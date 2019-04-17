@@ -16,7 +16,9 @@ import model.*;
 import tools.Logger;
 
 public class Evolver{
-        
+
+    private static final float PESO_SD = 5;
+    private static final int NUM_SUSTITUIDOS_POR_RONDA = 3;
     private Poblacion poblacion;
     private Poblacion poblacionPrueba;
     private EvolverConfig config;   //Ajustas los parametros del algoritmo evolutivo
@@ -171,6 +173,17 @@ public class Evolver{
         }
         
 		if (this.config.tipoSeleccion == TIPO_SELECCION.RULETA) {
+
+		    for(int i=0;i<NUM_SUSTITUIDOS_POR_RONDA;i++) {
+                double rnd = Math.random();
+                for (Criatura c : this.poblacion.getPoblacion()) {
+                    if (tablaProbs.get(c).belongsTo(rnd)) {
+                        this.poblacionPrueba.sustituirCercano(c);
+                        break;
+                    }
+                }
+            }
+
 			for (int i = 0; i < this.config.getTamanoPoblacion(); i++) {
 				Criatura a = null;
 				Criatura b = null;
@@ -315,7 +328,7 @@ public class Evolver{
     private Double evaluar(Criatura c) {
     	Integer victorias = this.victorias.get(c);
     	if(victorias==null)victorias=0;
-    	return (double) (10*victorias+2*dmgDone.get(c)+diffHP.get(c))*Math.abs(this.poblacion.calcSD(c));
+    	return (double) (10*victorias+2*dmgDone.get(c)+diffHP.get(c))*(Math.abs(this.poblacion.calcSD(c))*PESO_SD);
     }
 
     private void printResultadosPartidos(){
