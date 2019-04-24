@@ -15,6 +15,10 @@ public class CampoBatalla{
 
 
     //PARAMETROS DE COMBATE
+    private final int EN_ESQUIVAR = 2;
+    private final int EN_BLOQUEAR = 3;
+    private final int EN_ATACAR=1;
+
     private final double PESO_ARMADURA = 0.3;
 
 
@@ -22,17 +26,20 @@ public class CampoBatalla{
 
     Criatura a,b;
 
+    //En estos mapas guardaremos informacion de las dos criaturas, como vida, dano inflingido o energia
     Map<String, Integer> estadoA;
     Map<String, Integer> estadoB;
 
     public CampoBatalla(){}
 
     public int[] combate(Criatura a, Criatura b){
+        //Inicializamos los mapas
         estadoA = new HashMap<String, Integer>();
         estadoB = new HashMap<String, Integer>();
         this.a=a;
         this.b=b;
 
+        //Asignamos a cada criatura su vida inicial y su energia inicial, asi como ponemos dano inflingido a cero
         this.estadoA.put("HP", Integer.valueOf(a.getHP()));
         this.estadoB.put("HP", Integer.valueOf(b.getHP()));
         this.estadoA.put("EN", Integer.valueOf(a.getEN()));
@@ -40,15 +47,21 @@ public class CampoBatalla{
         this.estadoA.put("dmg_done", 0);
         this.estadoB.put("dmg_done", 0);
 
+        //Mientras que ambos esten con vida, y no hayan pasado mas de 50 rondas
         int cRonda=0;
         while(estadoA.get("HP")>0 && estadoB.get("HP")>0 && cRonda<50){
         	Logger.INFO("Ronda "+cRonda+". "
         			+ "{"+this.estadoA.get("HP")+","+this.estadoA.get("EN")+"} - "
         			+ "{"+this.estadoB.get("HP")+","+this.estadoB.get("EN")+"}", 0);
+
+        	//Funcion que gestiona las acciones del turno
             turno();
             cRonda++;
         }
 
+        //Vamos a devolver el resultado del combate como un array de ints que son lo siguiente:
+        //[victoria, hpA, hpB, dmgA, dmgB], donde victoria es -1 si A gana, 0 si empatan o 1 si B gana
+        //Ahora distinguimos cada caso en funcion de la vida que les quede a cada uno
         int[] resultado={0,0,0,0,0};
 		if (estadoA.get("HP") > 0 && estadoB.get("HP") > 0) {
 			Logger.INFO("EMPATE. Criatura A: " + this.estadoA.get("HP") + "HP. Criatura B: "
@@ -78,6 +91,7 @@ public class CampoBatalla{
 
     private void turno(){
         //Primero calculamos los indicadores para criatura A. Si positivo, A tiene mas que B.
+        //Estos indicadores son los que utilizaran las criaturas para tomar la decision de la accion en este turno
         int[] indicadores=new int[NUM_INDICADORES];
         indicadores[0]=this.estadoA.get("HP")-this.estadoB.get("HP");
         indicadores[1]=this.estadoA.get("EN")-this.estadoB.get("EN");
@@ -85,26 +99,31 @@ public class CampoBatalla{
         indicadores[3]=this.a.getArmadura()-this.b.getArmadura();
         indicadores[4]=0;
 
+        //Le pedimos a A que tome una decision
         String accionA=this.a.realizarAccion(indicadores);
 
+        //Invertimos los indicadores para B
         for(int i=0;i<NUM_INDICADORES-1;i++){
             indicadores[i]*=-1;
         }
 
+        //Le pedimos a B que tome una decision
         String accionB=this.b.realizarAccion(indicadores);
 
         
+        //Comprobamos que las criaturas tienen la energia necesaria para llevar a cabo la accion. Si no es asi, PASAR
+        if(accionA.equals("ESQUIVAR") && this.estadoA.get("EN")<EN_ESQUIVAR) accionA="PASAR";
+        else if(accionA.equals("BLOQUEAR") && this.estadoA.get("EN")<EN_BLOQUEAR) accionA="PASAR";
+        else if(accionA.equals("ATACAR") && this.estadoA.get("EN")<EN_ATACAR) accionA="PASAR";
         
-        if(accionA.equals("ESQUIVAR") && this.estadoA.get("EN")<2) accionA="PASAR";
-        else if(accionA.equals("BLOQUEAR") && this.estadoA.get("EN")<3) accionA="PASAR";
-        else if(accionA.equals("ATACAR") && this.estadoA.get("EN")<1) accionA="PASAR";
-        
-        if(accionB.equals("ESQUIVAR") && this.estadoB.get("EN")<2) accionB="PASAR";
-        else if(accionB.equals("BLOQUEAR") && this.estadoB.get("EN")<3) accionB="PASAR";        
-        else if(accionB.equals("ATACAR") && this.estadoB.get("EN")<1) accionB="PASAR";
+        if(accionB.equals("ESQUIVAR") && this.estadoB.get("EN")<EN_ESQUIVAR) accionB="PASAR";
+        else if(accionB.equals("BLOQUEAR") && this.estadoB.get("EN")<EN_BLOQUEAR) accionB="PASAR";
+        else if(accionB.equals("ATACAR") && this.estadoB.get("EN")<EN_ATACAR) accionB="PASAR";
 
         Logger.INFO("A->"+accionA+"; B->"+accionB, 0);
-        
+
+
+        //Dependiendo de la accion que tenga cada uno, actualizamos la vida de uno u otro
         if(accionA.equals("PASAR")){
             this.estadoA.put("EN",this.estadoA.get("EN")+1);
 
