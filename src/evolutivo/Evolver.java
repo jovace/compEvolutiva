@@ -27,6 +27,9 @@ public class Evolver{
     private Map<Criatura, Integer> diffHP = new HashMap<>();
     private Map<Criatura, Integer> dmgDone = new HashMap<>();
     private Map<Criatura, Intervalo> tablaProbs = new HashMap<>();
+
+    private int generaciones=0;
+
     
     public Evolver(){}
 
@@ -50,16 +53,16 @@ public class Evolver{
         }
 
         //Genero poblacion de prueba (la que se va a utilizar para combatir)
-        for(int i=0;i<tamanoPoblacion;i++){
+        /*for(int i=0;i<tamanoPoblacion;i++){
             Criatura c = generarCriaturaAleatoria();
             poblacionPruebaL.add(c);
             Logger.INFO(Arrays.toString(c.getAdn()), 7);
-        }
+        }*/
 
         //Cargamos en la clase Poblacion la lista. La clase poblacion permite operaciones teniendo en cuenta
         //el conjunto entero de la poblacion (media, sd, distancia...)
         poblacion=new Poblacion(poblacionL);
-        poblacionPrueba=new Poblacion(poblacionPruebaL);
+        //poblacionPrueba=new Poblacion(poblacionPruebaL);
     }
 
 
@@ -82,34 +85,32 @@ public class Evolver{
         return new Criatura(adn);
     }
 
-    public void run(){
-        //Comienza la ejecucion del algoritmo
-        int generaciones=0;
-        while(generaciones<500){//Condicion de parada
-        	Logger.INFO("Empezando ronda "+generaciones, 9);
-        	
-            //Simula los emparejamientos de todos los individuos con todos y obtiene puntuaciones
-            simularPartidos();
+    public int run(){
+        //Condicion de parada
+        Logger.INFO("Empezando ronda "+generaciones, 9);
 
-            printResultadosPartidos();
+        //Simula los emparejamientos de todos los individuos con todos y obtiene puntuaciones
+        simularPartidos();
 
-            //Dependiendo del record de victorias/derrotas y otras clasificaciones, 
-            //otorga probabilidades de seleccion
-            Logger.INFO("Entrando a fase ranking",4);
-            realizarRanking();
+        printResultadosPartidos();
+
+        //Dependiendo del record de victorias/derrotas y otras clasificaciones,
+        //otorga probabilidades de seleccion
+        Logger.INFO("Entrando a fase ranking",4);
+        realizarRanking();
 
 
-            printResumenPoblacion();
+        printResumenPoblacion();
 
 
-            //Selecciona individuos para la siguiente generacion dependiendo de probabilidades del ranking
-            Logger.INFO("Entrando a fase seleccion",4);
-            seleccion();
+        //Selecciona individuos para la siguiente generacion dependiendo de probabilidades del ranking
+        Logger.INFO("Entrando a fase seleccion",4);
+        seleccion();
 
 
-            //Rinse and repeat
-            generaciones++;
-        }
+        //Rinse and repeat
+        generaciones++;
+        return generaciones;
     }
 
     private void simularPartidos(){
@@ -121,7 +122,7 @@ public class Evolver{
         dmgDone.clear();
 
         for(Criatura c1 : this.poblacion.getPoblacion()){
-            for(Criatura c2 : this.poblacionPrueba.getPoblacion()){
+            for(Criatura c2 : this.poblacion.getPoblacion()){
                 if(c1.equals(c2))continue;
                 
                 Logger.INFO("PARTIDO: "+c1.getNombre()+" contra "+c2.getNombre(), 5);
@@ -200,7 +201,7 @@ public class Evolver{
 
 		    //Sustituimos en la poblacion de combate el numero de criaturas indicado. Seleccionamos criatura mediante
             //ruleta, y la sustituimos por la mas cercana en la poblacion de combate.
-		    for(int i=0;i<NUM_SUSTITUIDOS_POR_RONDA;i++) {
+		    /*for(int i=0;i<NUM_SUSTITUIDOS_POR_RONDA;i++) {
                 double rnd = Math.random();
                 for (Criatura c : this.poblacion.getPoblacion()) {
                     if (tablaProbs.get(c).belongsTo(rnd)) {
@@ -208,7 +209,7 @@ public class Evolver{
                         break;
                     }
                 }
-            }
+            }*/
 
 		    //Construimos la siguiente generacion
 			for (int i = 0; i < this.config.getTamanoPoblacion(); i++) {

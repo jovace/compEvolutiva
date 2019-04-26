@@ -1,7 +1,7 @@
 package tools;
 
 public abstract class Logger {
-	public static int level=6;
+	public static int level=9;
 	//0-> menos restrictivo, 10->Mas restrictivo
 	//0->Muestra estado y acciones de cada criatura en cada turno
 	//1->Muestra Resultado final del combate

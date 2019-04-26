@@ -1,5 +1,7 @@
 package model;
 
+import tools.Logger;
+
 import java.util.List;
 
 public class Poblacion {
@@ -20,15 +22,13 @@ public class Poblacion {
     }
 
     private float[] media(){
-        float[] acumulado=null;
+        float[] acumulado= new float[]{0, 0, 0, 0, 0};
         for (Criatura criatura : poblacion) {
-            if (acumulado == null) {
-                acumulado = criatura.getAdn();
-            } else {
-                for (int j = 0; j < acumulado.length; j++) {
-                    acumulado[j] += criatura.getAdn()[j];
-                }
-            }
+            acumulado[0]+=criatura.getHP();
+            acumulado[1]+=criatura.getAtaque();
+            acumulado[2]+=criatura.getArmadura();
+            acumulado[3]+=criatura.getEN();
+            acumulado[4]+=criatura.getAgilidad();
         }
 
         for(int i=0;i<acumulado.length;i++){
@@ -42,23 +42,31 @@ public class Poblacion {
         float[] media= media();
         float acumulado=0;
         for (Criatura criatura : poblacion) {
-            float dist=calculateDistance(media, criatura.getAdn());
+            float[] c =
+                    new float[]{criatura.getHP(), criatura.getAtaque(), criatura.getArmadura(),
+                            criatura.getEN(), criatura.getAgilidad()};
+            float dist=calculateDistance(media, c);
             acumulado+=dist;
         }
         acumulado/=this.poblacion.size();
         acumulado=(float) Math.sqrt((double) acumulado);
+        //Logger.INFO("-------------------- \n SD="+acumulado+"\n ------------ \n\n\n",10);
         return acumulado;
     }
 
     public float calcSD(Criatura criatura){
-        float dist=calculateDistance(this.media(), criatura.getAdn());
+        float[] media= media();
+        float[] c =
+                new float[]{criatura.getHP(), criatura.getAtaque(), criatura.getArmadura(),
+                        criatura.getEN(), criatura.getAgilidad()};
+        float dist=calculateDistance(media, c);
         dist/=this.stdDeviation();
         return dist;
     }
 
     private float calculateDistance(float[] a, float[] b){
         float dist=0;
-        for(int i=0;i<30;i++){
+        for(int i=0;i<a.length;i++){
             float coordDiff=a[i]-b[i];
             dist+= coordDiff*coordDiff;
         }
@@ -66,12 +74,28 @@ public class Poblacion {
         return dist;
     }
 
+    /*private float calculateDistance(Criatura a, Criatura b){
+        int diffHP=Math.abs(a.getHP()-b.getHP());
+        int diffAT=Math.abs(a.getAtaque()-b.getAtaque());
+        int diffAR=Math.abs(a.getArmadura()-b.getArmadura());
+        int diffEN=Math.abs(a.getEN()-b.getEN());
+        int diffAG=Math.abs(a.getAgilidad()-b.getAgilidad());
+        double suma=diffHP^2 + diffAT^2 + diffAR^2 + diffEN^2 + diffAG^2;
+        return (float)Math.sqrt(suma);
+    }*/
+
     public void sustituirCercano(Criatura criatura){
         float minDist=Float.MAX_VALUE;
         Criatura minC=null;
 
         for(Criatura c : this.poblacion){
-            float d=calculateDistance(criatura.getAdn(), c.getAdn());
+            float[] cf =
+                    new float[]{criatura.getHP(), criatura.getAtaque(), criatura.getArmadura(),
+                            criatura.getEN(), criatura.getAgilidad()};
+            float[] cf1 =
+                    new float[]{c.getHP(), c.getAtaque(), c.getArmadura(),
+                            c.getEN(), c.getAgilidad()};
+            float d=calculateDistance(cf1, cf);
             if(d<minDist){
                 minDist=d;
                 minC=c;
