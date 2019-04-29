@@ -3,6 +3,7 @@ package model;
 import tools.Logger;
 
 import java.util.List;
+import java.util.Random;
 
 public class Poblacion {
     private List<Criatura> poblacion;
@@ -21,7 +22,7 @@ public class Poblacion {
         this.poblacion=poblacion;
     }
 
-    private float[] media(){
+    public float[] media(){
         float[] acumulado= new float[]{0, 0, 0, 0, 0};
         for (Criatura criatura : poblacion) {
             acumulado[0]+=criatura.getHP();
@@ -109,4 +110,14 @@ public class Poblacion {
     }
 
 
+    public Criatura extraerCriaturaRnd() {
+        Random rand = new Random();
+        Criatura criatura = this.poblacion.get(rand.nextInt(this.poblacion.size()));
+        this.poblacion.remove(criatura);
+        return criatura;
+    }
+
+    public void insertarCriatura(Criatura c) {
+        this.poblacion.add(c);
+    }
 }

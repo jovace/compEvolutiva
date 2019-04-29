@@ -12,19 +12,21 @@ public class Adn{
     private final int NUM_ACCIONES=4;
     private final int NUM_INDICADORES=5;
 
-    private float[] adn; //30 fisico + 5x4 comportamiento
+    private int[] adn; //30 fisico + 5x4 comportamiento
+
+
     private int HP;
     private int AT;
     private int AR;
     private int EN;
     private int AG;
-    private float[] pesosAtacar;
-    private float[] pesosBloquear;
-    private float[] pesosEsquivar;
-    private float[] pesosPasar;
+    private int[] pesosAtacar;
+    private int[] pesosBloquear;
+    private int[] pesosEsquivar;
+    private int[] pesosPasar;
 
 
-    public Adn(float[] adn){
+    public Adn(int[] adn){
         this.HP=0;
         this.AT=0;
         this.AR=0;
@@ -60,7 +62,7 @@ public class Adn{
         }
 
         for(int i=0;i<NUM_ACCIONES;i++){
-            float[] pesos = new float[5];
+            int[] pesos = new int[5];
             for(int j=0;j<NUM_INDICADORES;j++){
                 pesos[j]=adn[30+NUM_ACCIONES*i+j];
             }
@@ -101,24 +103,28 @@ public class Adn{
         return this.AG;
     }
 
-    public float[] getPesosAtacar(){
+    public int[] getPesosAtacar(){
         return this.pesosAtacar;
     }
 
-    public float[] getPesosBloquear(){
+    public int[] getPesosBloquear(){
         return this.pesosBloquear;
     }
 
-    public float[] getPesosEsquivar(){
+    public int[] getPesosEsquivar(){
         return this.pesosEsquivar;
     }
 
-    public float[] getPesosPasar(){
+    public int[] getPesosPasar(){
         return this.pesosPasar;
     }
 
-    public float[] getAdn(){
+    public int[] getAdn(){
         return this.adn;
     }
+
+
+
+
 
 }

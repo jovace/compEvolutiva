@@ -19,6 +19,8 @@ public class Evolver{
 
     private static final float PESO_SD = 5;
     private static final int NUM_SUSTITUIDOS_POR_RONDA = 3;
+
+    private String nombre;
     private Poblacion poblacion;
     private Poblacion poblacionPrueba;
     private EvolverConfig config;   //Ajustas los parametros del algoritmo evolutivo
@@ -31,7 +33,7 @@ public class Evolver{
     private int generaciones=0;
 
     
-    public Evolver(){}
+    public Evolver(String nombre){this.nombre=nombre;}
 
     public void setConfig(EvolverConfig config){
         this.config=config;
@@ -53,22 +55,22 @@ public class Evolver{
         }
 
         //Genero poblacion de prueba (la que se va a utilizar para combatir)
-        /*for(int i=0;i<tamanoPoblacion;i++){
+        for(int i=0;i<tamanoPoblacion;i++){
             Criatura c = generarCriaturaAleatoria();
             poblacionPruebaL.add(c);
             Logger.INFO(Arrays.toString(c.getAdn()), 7);
-        }*/
+        }
 
         //Cargamos en la clase Poblacion la lista. La clase poblacion permite operaciones teniendo en cuenta
         //el conjunto entero de la poblacion (media, sd, distancia...)
         poblacion=new Poblacion(poblacionL);
-        //poblacionPrueba=new Poblacion(poblacionPruebaL);
+        poblacionPrueba=new Poblacion(poblacionPruebaL);
     }
 
 
     //Metodo para generar criatura con ADN aleatorio
     private Criatura generarCriaturaAleatoria(){
-        float[] adn = new float[50];
+        int[] adn = new int[50];
 
         //Generamos los 30 genes fisicos
         for(int j=0;j<30;j++){
@@ -79,7 +81,7 @@ public class Evolver{
 
         //Generamos el resto de genes de comportamiento
         for(int j=30;j<50;j++){
-            adn[j]=(float)(Math.random()-0.5)*20;
+            adn[j]=(int)((Math.random()-0.5)*20);
         }
 
         return new Criatura(adn);
@@ -102,6 +104,9 @@ public class Evolver{
 
         printResumenPoblacion();
 
+        //Logger.INFO("Media de poblacion "+this.nombre+" en ronda "+this.generaciones+": "+Arrays.toString(this.poblacion.media()), 10);
+        Logger.INFO(this.nombre+";"+this.generaciones+";"+Arrays.toString(this.poblacion.media()), 10);
+
 
         //Selecciona individuos para la siguiente generacion dependiendo de probabilidades del ranking
         Logger.INFO("Entrando a fase seleccion",4);
@@ -122,7 +127,7 @@ public class Evolver{
         dmgDone.clear();
 
         for(Criatura c1 : this.poblacion.getPoblacion()){
-            for(Criatura c2 : this.poblacion.getPoblacion()){
+            for(Criatura c2 : this.poblacionPrueba.getPoblacion()){
                 if(c1.equals(c2))continue;
                 
                 Logger.INFO("PARTIDO: "+c1.getNombre()+" contra "+c2.getNombre(), 5);
@@ -331,12 +336,13 @@ public class Evolver{
     private Criatura cruce(Criatura a, Criatura b){
         double ratioMutacion=this.config.getRatioMutacion();
         double tasaMutacion=this.config.getTasaMutacion();
-        float[] adnA=a.getAdn();
-        float[] adnB=b.getAdn();
-        float[] adnR=new float[50];
+        int[] adnA=a.getAdn();
+        int[] adnB=b.getAdn();
+        int[] adnR=new int[50];
 
         //Para los genes fisicos elegimos o bien de la madre o bien del padre, al ser valores discretos
-        for(int i=0;i<30;i++){
+        //Para todos los genes, al pasar a ser enteros
+        for(int i=0;i<50;i++){
             double rng = Math.random();
             if(rng<0.5){
                 adnR[i]=adnA[i];
@@ -347,7 +353,7 @@ public class Evolver{
 
         //Para los genes de comportamiento cogemos un numero aleatorio en el intervalo 0-1 y le damos el gen al hijo
         //en esa proporcion con respecto a los genes de los progenitores
-        for(int i=30;i<50;i++){
+        /*for(int i=30;i<50;i++){
             double rng=Math.random();
             adnR[i]=(float) (adnA[i]*rng + adnB[i]*(1-rng));
 
@@ -363,7 +369,7 @@ public class Evolver{
             //Ademas, si la mutacion salta a valores muy altos, la restringimos dentro de limites.
             if(Math.abs(adnR[i])>10)
                 if(adnR[i]>0){adnR[i]=10;}else{adnR[i]=-10;}
-        }
+        }*/
 
         return new Criatura(adnR);
     }
@@ -408,6 +414,14 @@ public class Evolver{
     	}
     	
     	Logger.INFO("----------------------", 9);
+    }
+
+    public Criatura extraerCriaturaRnd() {
+        return this.poblacion.extraerCriaturaRnd();
+    }
+
+    public void insertarCriatura(Criatura c){
+        this.poblacion.insertarCriatura(c);
     }
 
 

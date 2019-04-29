@@ -18,23 +18,23 @@ public class Criatura{
     private Adn adn;
     private String nombre;
 
-    
-    public Criatura(float[] adn){
+
+    public Criatura(int[] adn){
         this.adn = new Adn(adn);
         this.nombre=Arrays.toString(adn).hashCode()+"";
     }
-    
+
     public String printGenoma() {
-    	String genoma=printCFisicas();
-    	genoma+="Pesos={ \n";
-    	genoma+="HPDiff, ENDiff, ATDiff, ARDiff \n";
-    	genoma+="Atacar: "+Arrays.toString(this.adn.getPesosAtacar()) + " \n";
-    	genoma+="Bloquear: "+Arrays.toString(this.adn.getPesosBloquear()) + " \n";
-    	genoma+="Esquivar: "+Arrays.toString(this.adn.getPesosEsquivar()) + " \n";
-    	genoma+="Pasar: "+Arrays.toString(this.adn.getPesosPasar()) + " \n";
-    	genoma+="}";
-    	
-    	return genoma;
+        String genoma=printCFisicas();
+        genoma+="Pesos={ \n";
+        genoma+="HPDiff, ENDiff, ATDiff, ARDiff \n";
+        genoma+="Atacar: "+Arrays.toString(this.adn.getPesosAtacar()) + " \n";
+        genoma+="Bloquear: "+Arrays.toString(this.adn.getPesosBloquear()) + " \n";
+        genoma+="Esquivar: "+Arrays.toString(this.adn.getPesosEsquivar()) + " \n";
+        genoma+="Pasar: "+Arrays.toString(this.adn.getPesosPasar()) + " \n";
+        genoma+="}";
+
+        return genoma;
     }
 
     public String printCFisicas(){
@@ -61,7 +61,7 @@ public class Criatura{
 
     public int getHP(){
         return this.adn.getHP();
-    }    
+    }
 
     public int getEN(){
         return this.adn.getEN();
@@ -71,9 +71,11 @@ public class Criatura{
         return this.adn.getAG();
     }
 
-    public float[] getAdn(){
+    public int[] getAdn(){
         return this.adn.getAdn();
     }
+
+
 
     public String realizarAccion(int[] indicadores){
         if(indicadores.length!=NUM_INDICADORES){
@@ -84,11 +86,11 @@ public class Criatura{
         float valMax=Float.NEGATIVE_INFINITY;
         String accMax="";
 
-        float[] pesos;
+        int[] pesos;
 
 
         pesos=this.adn.getPesosAtacar();
-        float valor=0;
+        int valor=0;
         for(int i=0;i<NUM_INDICADORES-1;i++){
             valor+=indicadores[i]*pesos[i];
         }
