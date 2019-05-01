@@ -8,6 +8,8 @@ public class Launcher{
 
     private static final int MAX_GENERACIONES = 100;
     private static final int NUM_ISLAS = 10;
+    private static final int INTERVALO_INTERCAMBIO = 5;
+    private static final int NUM_INTERCAMBIOS = 1;
 
     public static void main(String[] args){
         Evolver[] e = new Evolver[NUM_ISLAS];
@@ -30,13 +32,15 @@ public class Launcher{
                 e[i].run();
             }
 
-            if(generaciones%15==0) {
-                int origen = (int)Math.random()*15;
-                int destino = (int)Math.random()*15;
-                Criatura a = e[origen].extraerCriaturaRnd();
-                Criatura b = e[destino].extraerCriaturaRnd();
-                e[destino].insertarCriatura(a);
-                e[origen].insertarCriatura(b);
+            if(generaciones%INTERVALO_INTERCAMBIO==0) {
+                for(int i=0;i<NUM_INTERCAMBIOS;i++) {
+                    int origen = (int) Math.random() * 15;
+                    int destino = (int) Math.random() * 15;
+                    Criatura a = e[origen].extraerCriaturaRnd();
+                    Criatura b = e[destino].extraerCriaturaRnd();
+                    e[destino].insertarCriatura(a);
+                    e[origen].insertarCriatura(b);
+                }
             }
             generaciones++;
         }

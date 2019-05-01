@@ -105,7 +105,8 @@ public class Evolver{
         printResumenPoblacion();
 
         //Logger.INFO("Media de poblacion "+this.nombre+" en ronda "+this.generaciones+": "+Arrays.toString(this.poblacion.media()), 10);
-        Logger.INFO(this.nombre+";"+this.generaciones+";"+Arrays.toString(this.poblacion.media()), 10);
+        float[] m = this.poblacion.media();
+        Logger.INFO((this.nombre+";"+this.generaciones+";"+m[0]+";"+m[1]+";"+m[2]+";"+m[3]+";"+m[4]).replace(',','.'), 10);
 
 
         //Selecciona individuos para la siguiente generacion dependiendo de probabilidades del ranking
