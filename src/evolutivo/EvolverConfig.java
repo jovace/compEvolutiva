@@ -14,7 +14,7 @@ public class EvolverConfig{
     public EvolverConfig(int tamanoPoblacion){
         this.tamanoPoblacion=tamanoPoblacion;
         this.ratioMutacion=4;
-        this.tasaMutacion=0.5;
+        this.tasaMutacion=0.05;
         this.tipoSeleccion=TIPO_SELECCION.RULETA;
     }
 

@@ -120,4 +120,10 @@ public class Poblacion {
     public void insertarCriatura(Criatura c) {
         this.poblacion.add(c);
     }
+
+    public Criatura getCriaturaRnd() {
+        Random rand = new Random();
+        Criatura criatura = this.poblacion.get(rand.nextInt(this.poblacion.size()));
+        return criatura;
+    }
 }

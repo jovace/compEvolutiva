@@ -63,8 +63,8 @@ public class Evolver{
 
         //Cargamos en la clase Poblacion la lista. La clase poblacion permite operaciones teniendo en cuenta
         //el conjunto entero de la poblacion (media, sd, distancia...)
-        poblacion=new Poblacion(poblacionL);
-        poblacionPrueba=new Poblacion(poblacionPruebaL);
+        this.poblacion=new Poblacion(poblacionL);
+        this.poblacionPrueba=new Poblacion(poblacionPruebaL);
     }
 
 
@@ -352,6 +352,21 @@ public class Evolver{
             }
         }
 
+        for(int i=0;i<30;i++){
+            double muta=Math.random();
+            if(muta<tasaMutacion){
+                int nValor=(int)(Math.random()*5);
+                adnR[i]=nValor;
+            }
+        }
+        for(int i=30;i<50;i++){
+            double muta=Math.random();
+            if(muta<tasaMutacion){
+                int nValor=(int)((Math.random()-0.5)*10);
+                adnR[i]=nValor;
+            }
+        }
+
         //Para los genes de comportamiento cogemos un numero aleatorio en el intervalo 0-1 y le damos el gen al hijo
         //en esa proporcion con respecto a los genes de los progenitores
         /*for(int i=30;i<50;i++){
@@ -423,6 +438,18 @@ public class Evolver{
 
     public void insertarCriatura(Criatura c){
         this.poblacion.insertarCriatura(c);
+    }
+
+    public List<Criatura> getPoblacion() {
+        return this.poblacion.getPoblacion();
+    }
+
+    public void setPoblacionPrueba(List<Criatura> poblacionPrueba) {
+        this.poblacionPrueba.setPoblacion(poblacionPrueba);
+    }
+
+    public Criatura getCriaturaRnd() {
+        return this.poblacion.getCriaturaRnd();
     }
 
 
